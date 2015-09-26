@@ -13,9 +13,9 @@
 //           The twitter: @johnedgarpark
 //
 ////////////////////////////////////////////////////////////////////////////
-// Software:  Arduino 1.0.5 (or later)
+// Software:  Arduino 1.6.5 (or later)
 // Hardware:  Arduino Uno (or equivalent)
-//            Adafruit Industries MotorShield V1 (for MotorShield V2, please use WrylongRoboticalFlowerBot2.ino)
+//            Adafruit Industries Motor Shield v2 (for MotorShield V1, please use WrylongRoboticalFlowerBot_old.ino)
 //            DC motor
 //            10mm red LED
 //            10mm green LED
@@ -25,12 +25,15 @@
 //            Stranded wire for circuit hookup
 //            WingShield Industries ScrewShield (optional) for connecting the wiring to the Arduino and Motor Shield
 //            4 AA battery supply (or wall wart) for powering the Arduino
-//            Proper battery for powering the motor (e.g., 7.2V 1500mAh NiMH RC car battery)
+//            Proper battery (or wall wart) for powering the motor (e.g., 7.2V 1500mAh NiMH RC car battery)
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include <AFMotor.h> //Include the Adafruit Motor Library (found here: https://learn.adafruit.com/adafruit-motor-shield/library-install )
-AF_DCMotor motor3(3); //We'll use the third motor output on the Motor Shield, so be sure to wire the motor to the to M3 terminal block outputs.
+#include <Wire.h>
+#include <Adafruit_MotorShield.h> 
+//Include the Adafruit Motor Library (found here: https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/install-software )
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); // Create the motor shield object with the default I2C address
+Adafruit_DCMotor *motor3 = AFMS.getMotor(3); //We'll use the third motor output on the Motor Shield, so be sure to wire the motor to the to M3 terminal block outputs.
 
 int moistPin = 0; //The analog A0 pin on the Arduino will test the resistance of the probe
 int moistValue; //variable to hold resistance read from moistPin.
@@ -48,8 +51,9 @@ void setup(){
   pinMode(alertLEDPin, OUTPUT);  //set LED pin modes to output
   digitalWrite(powerLEDPin, HIGH);  //light the power LED
   digitalWrite(alertLEDPin, LOW);  //make sure the alert LED is off
-  motor3.setSpeed(motorSpeed);  //set motor at full power
-  motor3.run(RELEASE);  //make sure motor is disengaged.
+  AFMS.begin(1000);
+  motor3->setSpeed(motorSpeed);  //set motor at full power
+  motor3->run(RELEASE);  //make sure motor is disengaged.
   Serial.begin(9600);  //initialize the serial port for output to the serial monitor for testing
   Serial.println();
   Serial.println();
@@ -93,14 +97,14 @@ void loop(){
     Serial.println("Oh dear! The soil level has dropped below the acceptable level. Watering shall now commence.");
     Serial.println();
     
-    motor3.run(FORWARD);   //set the motor running in the forward direction ("forward" is relative, you may change value to BACKWARD if the motor runs in the wrong direction to engage the watering can mechanism.)
+    motor3->run(FORWARD);   //set the motor running in the forward direction ("forward" is relative, you may change value to BACKWARD if the motor runs in the wrong direction to engage the watering can mechanism.)
     delay(motorRunValue);  //run the motor for the number of milliseconds set at the top of the sketch
-    motor3.run(RELEASE);   //stop the motor
+    motor3->run(RELEASE);   //stop the motor
     
     Serial.println("Watering has completed, moisture should soon return to an acceptable level.");
     Serial.println();
     Serial.println();
   }
 }
-// end WrylonRoboticalFlowerBot.ino
+// end WrylonRoboticalFlowerBot2.ino
 ////////////////////////////////////////////////////////////////////////////
